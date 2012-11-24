@@ -19,7 +19,8 @@ public  class  copytest1 {
 			
 				CopyJob copy = new CopyJob(sourcefile,destinationFile);
 			
-				jobList.add(copy);
+				if (copy.getSourceFileName() != null)
+					jobList.add(copy);
 			}
 				
 			Display display = new Display();

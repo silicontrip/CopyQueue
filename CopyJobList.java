@@ -1,7 +1,7 @@
-import java.util.ArrayList;
+import java.util.Vector;
 import java.util.Iterator;
 
-public class CopyJobList extends ArrayList<CopyJob>
+public class CopyJobList extends Vector<CopyJob>
 {
 
 	static CopyJobList instance = null;

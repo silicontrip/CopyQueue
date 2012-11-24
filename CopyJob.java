@@ -1,13 +1,8 @@
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
+import java.io.*;
 
-public class CopyJob  implements Runnable {
+public class CopyJob  implements Runnable, Serializable {
 
 	public final static String statusCode[] = {"Success","Pending","Copying","Error"};
 	public final static int OK = 0;
@@ -20,10 +15,10 @@ public class CopyJob  implements Runnable {
 	private File Destination;
 	private int status;
 
-	private Exception failReason;
+	transient private Exception failReason;
 	private int bufferSize;
-	private long startTime;
-	private long currentBytes;
+	transient private long startTime;
+	transient private long currentBytes;
 	private long fileLength;
 
 	public CopyJob () {
@@ -102,13 +97,9 @@ public class CopyJob  implements Runnable {
 	public boolean isErrored() { return status == ERROR; }
 	
 	
-	public int getStatus() {
-		return status;
-	}
+	public int getStatus() { return status; }
 
-	public Exception getStatusException() {
-		return failReason;
-	}
+	public Exception getStatusException() { return failReason; }
 
 	public String getSourceFileName() {
 		if (Source != null) {
@@ -150,6 +141,13 @@ public class CopyJob  implements Runnable {
 		}
 	}
 
+	public File getSource() { return Source; }
+	public File getDestination() { return Destination; }
+	
+	public long getFileLength() { return fileLength; }
+	public void setFileLength(long dummy) { fileLength = Source.length(); }
+
+	
 	public long getSize() { return fileLength; }
 	public long getCompletedBytes() { return currentBytes; }
 	public double getPercent() { return 100.0 * currentBytes / fileLength; }
@@ -179,4 +177,9 @@ public class CopyJob  implements Runnable {
 			bufferSize = bs; 
 		}
 	}
+	
+	public String toString () {
+		return ( "" + getStatus() +"|"+ getSourceFileName() +"|" + getDestinationPathName() +"|" + getSize() + "|" + bufferSize);
+	}
+	
 }
