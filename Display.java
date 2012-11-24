@@ -3,6 +3,9 @@ import com.googlecode.lanterna.terminal.text.UnixTerminal;
 import com.googlecode.lanterna.terminal.Terminal.Color;
 import com.googlecode.lanterna.terminal.TerminalSize;
 
+import java.util.Iterator;
+
+
 public class Display {
 	
 	UnixTerminal terminal;
@@ -78,6 +81,35 @@ public class Display {
 			return String.format("%2d:%02d:%02d",hour,minute,second);
 		}
 		return "--:--:--";
+	}
+	
+	public void updateList (CopyJobList list)
+	{
+	
+		int cursor = 5;
+		
+		Iterator<CopyJob> it =  list.iterator();
+		while (it.hasNext() && cursor < screenSize.getRows() ) {
+			CopyJob cj = it.next();
+			terminal.moveCursor(0,cursor);
+			
+			terminal.applyForegroundColor(Color.BLACK);
+			if (cj.isComplete()) { terminal.applyForegroundColor(Color.GREEN); }
+			if (cj.isErrored()) { 
+				terminal.applyForegroundColor(Color.RED);
+				System.out.print(cj.getSourceFileName() + ": " + cj.getStatusException().getMessage());
+			} else {
+				System.out.print (cj.getSourceFileName() + ": " + cj.getDestinationPathName());
+				if (screenSize.getColumns()-9 > 0) {
+					terminal.moveCursor(screenSize.getColumns()-9,cursor);
+					System.out.print(humanRead(cj.getSize()));
+				}
+				
+			}
+			
+			cursor++;
+		}
+		
 	}
 	
 	public void updateProgress(CopyJobList list) 

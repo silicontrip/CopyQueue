@@ -83,12 +83,12 @@ public class CopyJob  implements Runnable {
     	    inStream.close();
     	    outStream.close();
 			
-			
+			status = OK;
+
 		} catch (Exception e) {
 			failReason = e;
 			status = ERROR;
 		} 
-		status = OK;
 	}
 	
 	public void resetStatus () {

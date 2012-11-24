@@ -24,7 +24,8 @@ public  class  copytest1 {
 				
 			Display display = new Display();
 			
-			
+			display.updateList(jobList);
+
 			Iterator<CopyJob> it =  jobList.iterator();
 			while (it.hasNext()) {
 				
@@ -50,13 +51,7 @@ public  class  copytest1 {
 					}
 				}
 				display.updateProgress(jobList);
-				
-				// System.out.println("Status: " + CopyJob.statusCode[copy.getStatus()]);
-				
-				if (cj.isErrored()) {
-					cj.getStatusException().printStackTrace();
-				}
-				
+				display.updateList(jobList);
 				try {
 					thread.join();
 				} catch (java.lang.InterruptedException e) {

@@ -31,15 +31,17 @@ public class CopyJobList extends ArrayList<CopyJob>
 		Iterator<CopyJob> it =  this.iterator();
 		while (it.hasNext()) {
 			CopyJob cj = it.next();
-			if (cj.isComplete()) 
-				completedNumber++;
-			if (cj.isErrored())
+			
+			if (cj.isErrored()) {
 				errorNumber ++;
+			} else { // Don't count it if it errors.
+				if (cj.isComplete()) 
+					completedNumber++;
 			
-			completedBytes += cj.getCompletedBytes();
-			remainingBytes += cj.getRemainingBytes();
-			totalBytes += cj.getSize();
-			
+				completedBytes += cj.getCompletedBytes();
+				remainingBytes += cj.getRemainingBytes();
+				totalBytes += cj.getSize();
+			}			
 		}
 	}
 	
