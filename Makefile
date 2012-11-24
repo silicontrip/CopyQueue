@@ -1,5 +1,5 @@
 
-CLASSES = CopyJob.class CopyJobList.class  DisplayProgress.class \
+CLASSES = CopyJob.class CopyJobList.class  Display.class \
         copytest1.class
 
 CP=lanterna-2.1.1.jar:.

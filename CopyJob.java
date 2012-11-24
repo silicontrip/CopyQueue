@@ -73,7 +73,7 @@ public class CopyJob  implements Runnable {
     	    //copy the file content in bytes 
 			
 			startTime = java.lang.System.currentTimeMillis();
-			
+			status = COPY;
     	    while ((length = inStream.read(buffer)) > 0){
 				
     	    	outStream.write(buffer, 0, length);
@@ -96,13 +96,11 @@ public class CopyJob  implements Runnable {
 			status = WAIT;
 	}
 
-	public boolean isCopying() {
-		return status == COPY;
-	}
+	public boolean isCopying() { return status == COPY; }
+	public boolean isWaiting() { return status == WAIT; }
+	public boolean isComplete() { return status == OK; }
+	public boolean isErrored() { return status == ERROR; }
 	
-	public boolean isWaiting() {
-		return status == WAIT;
-	}
 	
 	public int getStatus() {
 		return status;

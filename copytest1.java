@@ -1,53 +1,71 @@
 import java.io.File;
+import java.util.Iterator;
 
 
 public  class  copytest1 {
-
-
-public static void main(String[] args) {
-
 	
-	File afile =new File(args[0]);
-	File bfile =new File(args[1]);
-
-	CopyJob copy = new CopyJob(afile,bfile);
 	
-	DisplayProgress display = new DisplayProgress();
-	
-	Thread thread = new Thread(copy);	
-	
-	thread.start();
-	
-	while (thread.isAlive()) {
+	public static void main(String[] args) {
 		
-		display.update(copy);
+		CopyJobList jobList = CopyJobList.getInstance();
 
-	//	System.out.println(" " + copy.getPercent() +"% : " + copy.getRemainingBytes() + " : " + copy.getBPS());
-
-		try {
 		
-			Thread.sleep(1000);
+		if (args.length >= 2) {
+			
+			File destinationFile =new File(args[args.length-1]);
 
-		} catch (java.lang.InterruptedException e) {
-			;
-			// but I don't want to be interrupted.
+			for (int i=0; i < args.length-1; i++) {
+				File sourcefile =new File(args[i]);
+			
+				CopyJob copy = new CopyJob(sourcefile,destinationFile);
+			
+				jobList.add(copy);
+			}
+				
+			Display display = new Display();
+			
+			
+			Iterator<CopyJob> it =  jobList.iterator();
+			while (it.hasNext()) {
+				
+				CopyJob cj = it.next();
+				
+				Thread thread = new Thread(cj);	
+				
+				thread.start();
+				
+				while (thread.isAlive()) {
+					
+					display.updateProgress(jobList);
+					
+					//	System.out.println(" " + copy.getPercent() +"% : " + copy.getRemainingBytes() + " : " + copy.getBPS());
+					
+					try {
+						
+						Thread.sleep(1000);
+						
+					} catch (java.lang.InterruptedException e) {
+						;
+						// but I don't want to be interrupted.
+					}
+				}
+				display.updateProgress(jobList);
+				
+				// System.out.println("Status: " + CopyJob.statusCode[copy.getStatus()]);
+				
+				if (cj.isErrored()) {
+					cj.getStatusException().printStackTrace();
+				}
+				
+				try {
+					thread.join();
+				} catch (java.lang.InterruptedException e) {
+					;
+					//  I don't care if I'm interrupted here.
+				}
+				
+			}
+			display.close();
 		}
 	}
-
-	 System.out.println("Status: " + CopyJob.statusCode[copy.getStatus()]);
-
-	if (copy.getStatus() == CopyJob.ERROR) {
-		copy.getStatusException().printStackTrace();
-	}
-	
-	try {
-		thread.join();
-	} catch (java.lang.InterruptedException e) {
-		;
-	//  I don't care if I'm interrupted here.
-	}
-	
-	display.close();
-}
-
 }
