@@ -15,7 +15,6 @@ public class CopyJobList extends ArrayList<CopyJob>
 	
 	
 	CopyJob getFirstWaiting() {
-		
 		Iterator<CopyJob> it =  this.iterator();
 		while (it.hasNext()) {
 			CopyJob cj = it.next();
@@ -33,5 +32,26 @@ public class CopyJobList extends ArrayList<CopyJob>
 		}
 		return false;
 	}
+	
+	CopyJob getCopying() {
+		Iterator<CopyJob> it =  this.iterator();
+		while (it.hasNext()) {
+			CopyJob cj = it.next();
+			if (cj.isCopying()) 
+				return cj; 
+		}
+		return null;
+	}
+	
+	
+	boolean isCopying() {
+		Iterator<CopyJob> it =  this.iterator();
+		while (it.hasNext()) {
+			if (it.next().isCopying()) 
+				return true; 
+		}
+		return false;
+	}
+	
 	
 }

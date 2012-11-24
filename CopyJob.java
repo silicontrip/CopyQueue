@@ -92,10 +92,14 @@ public class CopyJob  implements Runnable {
 	}
 	
 	public void resetStatus () {
-		if (status != COPY)
+		if (!isCopying())
 			status = WAIT;
 	}
 
+	public boolean isCopying() {
+		return status == COPY;
+	}
+	
 	public boolean isWaiting() {
 		return status == WAIT;
 	}
@@ -152,6 +156,16 @@ public class CopyJob  implements Runnable {
 	public long getCompletedBytes() { return currentBytes; }
 	public double getPercent() { return 100.0 * currentBytes / fileLength; }
 	public long getRemainingBytes() { return fileLength - currentBytes; }
+	
+	public double getETA() { 
+		
+		double bps = getBPS();
+		if (bps > 0) {
+			return getRemainingBytes() / bps;
+		}
+		return -1;
+	}
+		
 	public double getBPS() { 
 		
 		long now = java.lang.System.currentTimeMillis();
