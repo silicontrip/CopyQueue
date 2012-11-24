@@ -88,15 +88,22 @@ public class CopyJob  implements Runnable, Serializable {
 			} 
 		} else if (!Destination.exists()) {
 			// make it
-			Destination.mkdir();
-			status = OK;
-
+			try {
+				Destination.mkdir();
+				status = OK;
+			} catch (Exception e) {
+				failReason = e;
+				status = ERROR;
+			}
+		
 		}
 	}
 	
 	public void resetStatus () {
-		if (!isCopying())
+		if (!isCopying()) {
 			status = WAIT;
+			currentBytes = 0;
+		}
 	}
 	
 	public boolean isCopying() { return status == COPY; }

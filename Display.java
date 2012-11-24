@@ -3,10 +3,10 @@ import com.googlecode.lanterna.terminal.text.UnixTerminal;
 import com.googlecode.lanterna.terminal.Terminal.Color;
 import com.googlecode.lanterna.terminal.Terminal.SGR;
 import com.googlecode.lanterna.terminal.TerminalSize;
-
-import java.util.Iterator;
-
 import com.googlecode.lanterna.input.Key;
+import com.googlecode.lanterna.LanternaException;
+
+import java.io.IOException;
 
 public class Display {
 	
@@ -18,6 +18,11 @@ public class Display {
 	int files;
 	int cursorPosition;
 	int displayPosition;
+	
+	
+	int listFiles;
+	int listComplete;
+	int listError;
 	
 	final static int base = 1000;
 	final static char suffix[] = {' ','k','M','G','T','P','E','Z','Y'};
@@ -34,14 +39,7 @@ public class Display {
 		displayPosition = 0;
 		
 		// divider
-		
-		
-		for (int i=0; i < screenSize.getColumns(); i++) {
-			terminal.moveCursor(i,4); terminal.putCharacter('-');
-		}
-		
-		
-		
+		fillLine(4,'-');		
 	}
 	
 	private String padBytes(long bytes)
@@ -66,10 +64,34 @@ public class Display {
 		
 	}
 	
+	
+	private void drawBar (int line, double per) {
+		terminal.moveCursor(0,line); terminal.putCharacter('[');
+		terminal.moveCursor(screenSize.getColumns(),line); terminal.putCharacter(']');
+		
+		int totalLength = screenSize.getColumns()-2;
+		
+		int bar =(int)(totalLength * per / 100);
+		
+		terminal.moveCursor(1,line);
+		fillChar(bar,'=');
+		fillChar(totalLength-bar,' ');
+		
+	}
+	
+	private void fillLine(int line,char ch) {
+		terminal.moveCursor(0,line); 
+		fillChar(screenSize.getColumns(),ch);	
+		terminal.moveCursor(0,line); 
+	}
+	
 	private void clearLine(int line) {
-		terminal.moveCursor(0,line); 
-		spaces(screenSize.getColumns()-1);	
-		terminal.moveCursor(0,line); 
+		fillLine(line,' ');
+	}
+	
+	private void fillChar (int number,char ch ) {
+		for (int i=0; i<number;i++)
+			terminal.putCharacter(ch);
 	}
 	
 	
@@ -88,27 +110,28 @@ public class Display {
 		return "--:--:--";
 	}
 	
-	private void spaces (int number) {
-		for (int i=0; i<number;i++)
-			terminal.putCharacter(' ');
-	}
 	
-	public void keyboardInput(CopyJobList list) {
+	public boolean keyboardInput(CopyJobList list) throws LanternaException {
 		//  have to wait until this is called.
 		// there is no callback
+		
+		boolean keypress = false;
 		
 		Key keyboard;
 		while ((keyboard = terminal.readInput()) != null) 
 		{
 			if (list.size() > 0) {
 				if (keyboard.getKind() == Key.Kind.ArrowUp) {
+					keypress = true;
 					cursorPosition = cursorPosition > 0 ? cursorPosition-1:0;
 					// may need to update displayPosition
 					if (cursorPosition < displayPosition)
 						displayPosition = cursorPosition;
 				}
 				if (keyboard.getKind() == Key.Kind.ArrowDown) {
-					cursorPosition = cursorPosition < list.size() ? cursorPosition+1:list.size()-1;
+					keypress = true;
+
+					cursorPosition = cursorPosition < list.size()-1 ? cursorPosition+1:list.size()-1;
 					// may need to update displayPosition
 					
 					// bottom of displayed list
@@ -121,7 +144,63 @@ public class Display {
 					}
 					
 				}
+				if (keyboard.getKind() == Key.Kind.PageUp)
+				{
+					keypress = true;
+
+					int scroll = (screenSize.getRows() - PROGRESS_SIZE) -1;
+					
+					cursorPosition = cursorPosition-scroll  >= 0 ? cursorPosition-scroll:0;
+					// may need to update displayPosition
+					if (cursorPosition < displayPosition)
+						displayPosition = cursorPosition;
+					
+					
+				}
+				if (keyboard.getKind() == Key.Kind.Home)
+				{		
+					keypress = true;
+
+					cursorPosition = 0;
+					// may need to update displayPosition
+					if (cursorPosition < displayPosition)
+						displayPosition = cursorPosition;
+				}
+				
+				if (keyboard.getKind() == Key.Kind.PageDown) {
+					keypress = true;
+					
+					int scroll = (screenSize.getRows() - PROGRESS_SIZE)-1;
+
+					cursorPosition = cursorPosition+scroll < list.size() ? cursorPosition+scroll:list.size()-1;
+					// may need to update displayPosition
+					
+					// bottom of displayed list
+					
+					int displayBottom = scroll + displayPosition ;
+					
+					if (cursorPosition > displayBottom) {
+						displayPosition = cursorPosition - scroll;
+					}
+					
+				}
+				if (keyboard.getKind() == Key.Kind.End)
+				{		
+					keypress = true;
+					
+					cursorPosition = list.size()-1;
+					int displayableRows = (screenSize.getRows() - PROGRESS_SIZE)-1;
+					int displayBottom = displayableRows + displayPosition ;
+					
+					if (cursorPosition > displayBottom) {
+						displayPosition = cursorPosition - displayableRows;
+					}
+				}
+				
+				
 				if (keyboard.getKind() == Key.Kind.Delete || keyboard.getKind() == Key.Kind.Backspace ) {
+					keypress = true;
+
 					// remove from list.
 					list.removeElementAt(cursorPosition);
 					if(cursorPosition >= list.size()) {
@@ -129,6 +208,8 @@ public class Display {
 					}
 				}
 				if (keyboard.getKind() == Key.Kind.Enter) {
+					keypress = true;
+
 					// retry errored list.
 					list.elementAt(cursorPosition).resetStatus();
 				}
@@ -136,14 +217,16 @@ public class Display {
 			if (keyboard.getKind() == Key.Kind.Escape || 
 				(keyboard.getKind() == Key.Kind.NormalKey && keyboard.getCharacter() == 3)) {
 				
+				throw new LanternaException(new IOException("End of Terminal Input"));
 				// exit
 				
 			}
 			
 		}
+		return keypress;
 	}		
 	
-	public void updateList (CopyJobList list)
+	public void updateList (CopyJobList list) throws LanternaException
 	{
 		
 		int cursor = PROGRESS_SIZE;
@@ -151,51 +234,66 @@ public class Display {
 		// WAITING files have next highest
 		// COMPLETE have lowest display priority
 		
+		list.updateTotals();
 		
-		keyboardInput(list);
-		
-		int bottom = screenSize.getRows() - PROGRESS_SIZE + displayPosition;
-		
-		for (int iterate = displayPosition ; iterate < list.size() && iterate < bottom; iterate ++) {
-			CopyJob cj = list.elementAt(iterate);
-			terminal.moveCursor(0,cursor);
+		if (keyboardInput(list) ||
+			list.getCompletedNumber() != listComplete ||
+			list.getErrorNumber() != listError ||
+			list.size() != listFiles) {
 			
-			if (iterate == cursorPosition) {
-				terminal.applySGR(SGR.ENTER_REVERSE);
+			listComplete = list.getCompletedNumber();
+			listError = list.getErrorNumber();
+			listFiles = list.size();
+			
+			int bottom = screenSize.getRows() - PROGRESS_SIZE + displayPosition;
+			
+			for (int iterate = displayPosition ; iterate < list.size() && iterate < bottom; iterate ++) {
+				CopyJob cj = list.elementAt(iterate);
+				terminal.moveCursor(0,cursor);
+				
+				if (iterate == cursorPosition) {
+					terminal.applySGR(SGR.ENTER_REVERSE);
+				}
+				terminal.applyForegroundColor(Color.BLACK);
+				if (cj.isComplete()) { terminal.applyForegroundColor(Color.GREEN); }
+				if (cj.isErrored()) { 
+					terminal.applyForegroundColor(Color.RED);
+
+					clearLine(cursor); 
+										
+					String disp = cj.getSourceFileName() + ": " + cj.getStatusException().getMessage();
+					// truncate if greater than 
+					if (disp.length() > screenSize.getColumns()) {
+						disp = disp.substring(0,screenSize.getColumns()-1);
+					}
+					System.out.print(disp);
+					
+				} else {
+					clearLine(cursor);
+					
+					System.out.print (cj.getSourceFileName());
+					if (screenSize.getColumns()-(11+cj.getDestinationPathName().length())  > 0) {
+						terminal.moveCursor(screenSize.getColumns()-(11+cj.getDestinationPathName().length()),cursor);
+						System.out.print( cj.getDestinationPathName());
+					}
+					if (screenSize.getColumns()-9 > 0) {
+						terminal.moveCursor(screenSize.getColumns()-9,cursor);
+						System.out.print(humanRead(cj.getSize()));
+					}
+					
+				}
+				if (iterate == cursorPosition) {
+					terminal.applySGR(SGR.EXIT_REVERSE);
+				}
+				cursor ++;
 			}
-			terminal.applyForegroundColor(Color.BLACK);
-			if (cj.isComplete()) { terminal.applyForegroundColor(Color.GREEN); }
-			if (cj.isErrored()) { 
+			
+			if (list.size() < bottom) {
 				clearLine(cursor); 
-				
-				
-				terminal.applyForegroundColor(Color.RED);
-				String disp = cj.getSourceFileName() + ": " + cj.getStatusException().getMessage();
-				// truncate if greater than 
-				System.out.print(disp);
-				
-			} else {
-				clearLine(cursor);
-				
-				System.out.print (cj.getSourceFileName());
-				if (screenSize.getColumns()-(11+cj.getDestinationPathName().length())  > 0) {
-					terminal.moveCursor(screenSize.getColumns()-(11+cj.getDestinationPathName().length()),cursor);
-					System.out.print( cj.getDestinationPathName());
-				}
-				if (screenSize.getColumns()-9 > 0) {
-					terminal.moveCursor(screenSize.getColumns()-9,cursor);
-					System.out.print(humanRead(cj.getSize()));
-				}
-				
-			}
-			if (iterate == cursorPosition) {
-				terminal.applySGR(SGR.EXIT_REVERSE);
-			}
-			cursor ++;
 		}
-		
-		
-		terminal.flush();
+			
+			terminal.flush();
+		}
 	}
 	
 	public void updateProgress(CopyJobList list) 
@@ -242,14 +340,8 @@ public class Display {
 		
 		// percent bar
 		
-		terminal.moveCursor(0,1); terminal.putCharacter('[');
-		terminal.moveCursor(screenSize.getColumns(),1); terminal.putCharacter(']');
+		drawBar(1,current.getPercent());
 		
-		int bar =(int)( (screenSize.getColumns()-2) * current.getPercent() / 100);
-		
-		for (int i=0; i < bar; i++) {
-			terminal.moveCursor(i+1,1); terminal.putCharacter('=');
-		}
 		
 	}
 	
@@ -258,20 +350,19 @@ public class Display {
 		
 		if (list != null)  {
 			
-			
-			if (list.size() != files) {
-				files = list.size();
-				clearLine(2); clearLine(3);
-			}
-			
 			list.updateTotals();
 			terminal.moveCursor(0, 2);
 			
 			
-			System.out.print("TOTAL: " + list.getCompletedNumber() + " of " + list.size() + " " +
-							 humanRead(list.getCompletedBytes()) + " of " + humanRead(list.getTotalBytes()) + " " +
-							 humanRead(list.getRemainingBytes()) + " remain " + list.getErrorNumber() + " Errors " );
+			System.out.print("TOTAL: " + list.getCompletedNumber() + " of " + list.size() + "   " +
+							 humanRead(list.getCompletedBytes()) + " of " + humanRead(list.getTotalBytes()) + "   " +
+							 humanRead(list.getRemainingBytes()) + " remain   " + list.getErrorNumber() + " Error" );
 			
+			if (list.getErrorNumber() != 1) {
+				System.out.print("s ");
+			} else {
+				System.out.print("  ");
+			}
 			
 			if (screenSize.getColumns()-14 > 0) {
 				terminal.moveCursor(screenSize.getColumns()-14,2);
@@ -288,14 +379,7 @@ public class Display {
 			
 			// percent bar
 			
-			terminal.moveCursor(0,3); terminal.putCharacter('[');
-			terminal.moveCursor(screenSize.getColumns(),3); terminal.putCharacter(']');
-			
-			int bar =(int)( (screenSize.getColumns()-2) * list.getPercent() / 100);
-			
-			for (int i=0; i < bar; i++) {
-				terminal.moveCursor(i+1,3); terminal.putCharacter('=');
-			}
+			drawBar(3,list.getPercent());
 		}
 		
 	}

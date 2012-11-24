@@ -10,12 +10,16 @@ public  class  copyqueue {
 		CopyJobList jobList = CopyJobList.getInstance();
 		
 		// set up listener
+		Thread listenThread=null;
+		Display display=null;
 		
 		try { 
-			Thread listenThread = new Thread(new CopyListener());
+			listenThread = new Thread(new CopyListener());
+			listenThread.setDaemon(true);
+			listenThread.setName("CopyListener");
 			listenThread.start();
 			
-			Display display = new Display();
+			 display = new Display();
 			
 			while (true) {
 				
@@ -46,6 +50,7 @@ public  class  copyqueue {
 					display.updateList(jobList);
 					try {
 						thread.join();
+						
 					} catch (java.lang.InterruptedException e) {
 						;
 						//  I don't care if I'm interrupted here.
@@ -64,10 +69,17 @@ public  class  copyqueue {
 			// want to allow ctrl-c exit. 
 			// or some form of interface quit
 			// never called
-			// display.close();
+		} catch (com.googlecode.lanterna.LanternaException le) {
+			if (listenThread != null) {				
+				listenThread.interrupt();
+			}
+			if (display != null) {
+				display.close();
+			}
 		} catch (java.io.IOException e) {
 			System.out.println ("Could not create the listening socket: " + e.getMessage());
 			e.printStackTrace();
 		}
+
 	}
 }

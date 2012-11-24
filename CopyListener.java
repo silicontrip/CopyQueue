@@ -32,8 +32,8 @@ public class CopyListener  implements Runnable {
 			} catch (Exception e) {
 				// not sure what to do with these.
 				// need a log...
-			//	System.out.println ("input: " + e.getMessage());
-			//	e.printStackTrace();
+				System.out.println ("input: " + e.getMessage());
+				e.printStackTrace();
 				
 			}
 			

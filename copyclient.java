@@ -15,7 +15,7 @@ public  class  copyclient {
 		ObjectOutputStream oos = new ObjectOutputStream(comm.getOutputStream());
 		CopyJob copy = new CopyJob(src,dst);
 		
-		System.out.println("Copy: " + copy);
+		// System.out.println("Copy: " + copy);
 		oos.writeObject(copy);
 	}
 	
@@ -24,7 +24,7 @@ public  class  copyclient {
 		
 		File destinationFile = new File(dst.getCanonicalPath() +  File.separator + dir.getName());
 		
-		addFile(null,destinationFile);
+		if (!destinationFile.exists()) { addFile(null,destinationFile); }
 		
 		File filelist[] = dir.listFiles();
 		
@@ -75,7 +75,7 @@ public  class  copyclient {
 							System.out.println ("Source is not a file.");
 						}
 					} catch (IOException ioe) {
-						System.out.println ("IOException: " + ioe.getMessage());
+						System.out.println ("Cannot submit request: " + ioe.getMessage());
 					}
 					
 				}
