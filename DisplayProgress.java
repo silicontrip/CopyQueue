@@ -1,11 +1,14 @@
 import com.googlecode.lanterna.TerminalFacade;
 import com.googlecode.lanterna.terminal.text.UnixTerminal;
-import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal.Color;
+import com.googlecode.lanterna.terminal.TerminalSize;
 
 public class DisplayProgress {
 
 	UnixTerminal terminal;
+	TerminalSize screenSize;
+	int width;
+	int height;
 	// Screen scr;
 	
 	final static int base = 1000;
@@ -17,7 +20,7 @@ public class DisplayProgress {
 		terminal.enterPrivateMode();
 
 		terminal.clearScreen();
-	//	scr = new Screen(term);
+		screenSize = terminal.getTerminalSize();		
 		
 		
 	}
@@ -71,18 +74,41 @@ public class DisplayProgress {
 	public void update(CopyJob current)
 	{
 		// want to make these positions dynamic.
-		terminal.moveCursor(0, 1);
+		terminal.moveCursor(0, 0);
 		System.out.print(current.getSourceFileName());
-		terminal.moveCursor(41,1);
-		System.out.print( padBytes(current.getCompletedBytes()));
-		terminal.moveCursor(54,1);
-		System.out.print(formatPercent(current.getPercent()));
-		terminal.moveCursor(59,1);
-		System.out.print(humanRead(current.getBPS()) + "B/s "); 
-		terminal.moveCursor(72,1);
-		System.out.print(formatSeconds((int)current.getETA()));
+		
+		if (screenSize.getColumns()-8 > 0) {
+			terminal.moveCursor(screenSize.getColumns()-8,0);
+			System.out.print(formatSeconds((int)current.getETA()));
+		}
 
+		if (screenSize.getColumns()-21 > 0) {
+			terminal.moveCursor(screenSize.getColumns()-21,0);
+			System.out.print(humanRead(current.getBPS()) + "B/s "); 
+		}
+		
+		if (screenSize.getColumns()-26 > 0) {
+			terminal.moveCursor(screenSize.getColumns()-26,0);
+			System.out.print(formatPercent(current.getPercent()));
+		}
+		
+		
+		if (screenSize.getColumns()-39 > 0) {
+			terminal.moveCursor(screenSize.getColumns()-39,0);
+			System.out.print( padBytes(current.getCompletedBytes()));
+		}
 
+		// percent bar
+		
+		terminal.moveCursor(0,1); terminal.putCharacter('[');
+		terminal.moveCursor(screenSize.getColumns(),1); terminal.putCharacter(']');
+		
+		int bar =(int)( (screenSize.getColumns()-2) * current.getPercent() / 100);
+		
+		for (int i=0; i < bar; i++) {
+			terminal.moveCursor(i+1,1); terminal.putCharacter('=');
+		}
+		
 		/*
 		scr.putString(0,1,current.getSourceFileName(),Color.BLACK,Color.WHITE);
 		scr.putString(41,1,padBytes(current.getCompletedBytes()),Color.BLACK,Color.WHITE);
