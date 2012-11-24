@@ -1,0 +1,53 @@
+
+
+Main
+
+new Thread (Listener)
+thread.start();
+
+for (;;) {
+
+if CopyList.hasNextWaiting() {
+
+	new Thread (CopyList.getNextWaiting())
+
+	thread.start
+
+	while (thread.isAlive) {
+		update progressDisplay
+		sleep 1
+	}
+
+}
+update fileDisplay
+sleep 1
+}
+
+
+copy
+{
+
+get next file
+if (next file)
+{
+	read loop {
+		update xfer
+		update bytes
+	}
+	update files
+}
+else
+{ sleep 1; }
+
+}
+
+
+ArrayList
+getNext
+
+Listen
+
+Add
+Remove
+reset
+

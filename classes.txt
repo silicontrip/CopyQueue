@@ -1,0 +1,29 @@
+CopyJob
+
+Source File
+Destination File
+Status
+
+bufferSize
+startTime
+
+construct (File src, File dst)
+resetStatus()
+copy()
+getStatus()
+getSrc
+getDst
+setSrc
+setDst
+
+getSize()
+getCompletedBytes()
+getPercent()
+getRemainBytes()
+getBPS()
+
+setBufferSize(int size);
+
+================================================================================
+
+
