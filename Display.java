@@ -100,35 +100,38 @@ public class Display {
 		Key keyboard;
 		while ((keyboard = terminal.readInput()) != null) 
 		{
-			if (keyboard.getKind() == Key.Kind.ArrowUp) {
-				cursorPosition = cursorPosition > 0 ? cursorPosition-1:0;
-				// may need to update displayPosition
-				if (cursorPosition < displayPosition)
-					displayPosition = cursorPosition;
-			}
-			if (keyboard.getKind() == Key.Kind.ArrowDown) {
-				cursorPosition = cursorPosition < list.size() ? cursorPosition+1:list.size();
-				// may need to update displayPosition
-				
-				// bottom of displayed list
-				
-				int displayableRows = (screenSize.getRows() - PROGRESS_SIZE)-1;
-				int displayBottom = displayableRows + displayPosition ;
-				
-				if (cursorPosition > displayBottom) {
-					displayPosition = cursorPosition - displayableRows;
+			if (list.size() > 0) {
+				if (keyboard.getKind() == Key.Kind.ArrowUp) {
+					cursorPosition = cursorPosition > 0 ? cursorPosition-1:0;
+					// may need to update displayPosition
+					if (cursorPosition < displayPosition)
+						displayPosition = cursorPosition;
 				}
-				
-			}
-			if (keyboard.getKind() == Key.Kind.Delete || keyboard.getKind() == Key.Kind.Backspace ) {
-				// remove from list.
-				list.removeElementAt(cursorPosition);
-				
-			}
-			
-			if (keyboard.getKind() == Key.Kind.Enter) {
-				// retry errored list.
-				list.elementAt(cursorPosition).resetStatus();
+				if (keyboard.getKind() == Key.Kind.ArrowDown) {
+					cursorPosition = cursorPosition < list.size() ? cursorPosition+1:list.size()-1;
+					// may need to update displayPosition
+					
+					// bottom of displayed list
+					
+					int displayableRows = (screenSize.getRows() - PROGRESS_SIZE)-1;
+					int displayBottom = displayableRows + displayPosition ;
+					
+					if (cursorPosition > displayBottom) {
+						displayPosition = cursorPosition - displayableRows;
+					}
+					
+				}
+				if (keyboard.getKind() == Key.Kind.Delete || keyboard.getKind() == Key.Kind.Backspace ) {
+					// remove from list.
+					list.removeElementAt(cursorPosition);
+					if(cursorPosition >= list.size()) {
+						cursorPosition = list.size()-1;
+					}
+				}
+				if (keyboard.getKind() == Key.Kind.Enter) {
+					// retry errored list.
+					list.elementAt(cursorPosition).resetStatus();
+				}
 			}
 			if (keyboard.getKind() == Key.Kind.Escape || 
 				(keyboard.getKind() == Key.Kind.NormalKey && keyboard.getCharacter() == 3)) {
@@ -168,6 +171,7 @@ public class Display {
 				
 				terminal.applyForegroundColor(Color.RED);
 				String disp = cj.getSourceFileName() + ": " + cj.getStatusException().getMessage();
+				// truncate if greater than 
 				System.out.print(disp);
 				
 			} else {

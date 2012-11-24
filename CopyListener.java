@@ -13,13 +13,8 @@ public class CopyListener  implements Runnable {
 	
 	
 	public CopyListener () throws IOException {
-		
-		
 		InetAddress inet = InetAddress.getByName(HOST);
 		listen = new ServerSocket(PORT,0,inet);
-		
-		
-		
 	}
 	
 	public void run() {
@@ -32,12 +27,8 @@ public class CopyListener  implements Runnable {
 				ois = new ObjectInputStream(comm.getInputStream());
 
 				CopyJob copy = (CopyJob) ois.readObject();
-				// System.out.println("Copy: " + copy);
-
-				if (copy.getSourceFileName() != null) {
-					
-					jobList.add(copy);
-				}
+				jobList.add(copy);
+				
 			} catch (Exception e) {
 				// not sure what to do with these.
 				// need a log...
