@@ -12,13 +12,17 @@ public static void main(String[] args) {
 
 	CopyJob copy = new CopyJob(afile,bfile);
 	
+	DisplayProgress display = new DisplayProgress();
+	
 	Thread thread = new Thread(copy);	
 	
 	thread.start();
 	
 	while (thread.isAlive()) {
 		
-		System.out.println(" " + copy.getPercent() +"% : " + copy.getRemainingBytes() + " : " + copy.getBPS());
+		display.update(copy);
+
+	//	System.out.println(" " + copy.getPercent() +"% : " + copy.getRemainingBytes() + " : " + copy.getBPS());
 
 		try {
 		
@@ -30,19 +34,20 @@ public static void main(String[] args) {
 		}
 	}
 
-	System.out.println("Status: " + CopyJob.statusCode[copy.getStatus()]);
+	 System.out.println("Status: " + CopyJob.statusCode[copy.getStatus()]);
 
 	if (copy.getStatus() == CopyJob.ERROR) {
 		copy.getStatusException().printStackTrace();
 	}
 	
 	try {
-	thread.join();
+		thread.join();
 	} catch (java.lang.InterruptedException e) {
-	;
+		;
 	//  I don't care if I'm interrupted here.
-}
+	}
 	
+	display.close();
 }
 
 }

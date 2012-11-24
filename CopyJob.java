@@ -57,8 +57,8 @@ public class CopyJob  implements Runnable {
 		
 		try{
 			
-			System.out.println ("copy: " + getSourceFileName());
-			System.out.println ("to: " + getDestinationPathName() + File.separator + getSourceFileName());
+//          System.out.println ("copy: " + getSourceFileName());
+//			System.out.println ("to: " + getDestinationPathName() + File.separator + getSourceFileName());
 
 			inStream = new FileInputStream(Source);
 			
@@ -171,7 +171,7 @@ public class CopyJob  implements Runnable {
 		long now = java.lang.System.currentTimeMillis();
 		
 		if (now > startTime) {
-			return 1.0 * currentBytes / (now - startTime); 
+			return 1000.0 * currentBytes / (now - startTime); 
 		}
 		return 0 ;
 	}
