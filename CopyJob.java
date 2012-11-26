@@ -39,6 +39,15 @@ public class CopyJob  implements Runnable, Serializable {
 		setDestination(dst);
 	}
 	
+	public CopyJob (String src, String dst) 
+	{
+		this();
+		
+		setSource(src);
+		setDestination(dst);
+	}
+	
+	
 	public void run() {
 		this.copy();
 	}
@@ -122,6 +131,19 @@ public class CopyJob  implements Runnable, Serializable {
 		}
 		return null;
 	}
+	
+	public String getSourcePath() {
+		if (Source != null) {
+			try {
+				return Source.getCanonicalPath();
+			} catch (IOException e) {
+				return e.getMessage();
+			}
+		}
+		return null;
+	}
+	
+	
 	public String getDestinationFileName() {
 		if (Destination != null) {
 			return Destination.getName();
@@ -149,6 +171,28 @@ public class CopyJob  implements Runnable, Serializable {
 		}
 		
 	}
+	
+	public void setSource (String src) 
+	{
+		File f = new File (src);
+		if (f == null) {
+			Source = null;
+		} else if (f.isFile()) {
+			fileLength = f.length();
+			Source = f;
+		}
+	}
+	
+	public void setDestination (String dst) 
+	{
+		File f = new File (dst);
+		if (f == null) {
+			Destination = null;
+		} else {
+			Destination = f;
+		}
+	}
+	
 	
 	public void setDestination (File dst)
 	{
@@ -193,7 +237,7 @@ public class CopyJob  implements Runnable, Serializable {
 	}
 	
 	public String toString () {
-		return ( "" + getStatus() +"|"+ getSourceFileName() +"|" + getDestinationPathName() +"|" + getSize() + "|" + bufferSize);
+			return ( "" + getStatus() +"|"+ getSourcePath() +"|" + getDestinationPathName() +"|" + getSize() + "|" + bufferSize);
 	}
 	
 }

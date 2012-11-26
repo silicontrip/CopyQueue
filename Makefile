@@ -13,7 +13,7 @@ copyqueue.jar: classes
 classes: $(CLASSES)
 
 %.class: %.java
-	javac  -classpath $(CP) -Xlint:deprecation -Xlint:unchecked -target 1.5 $<
+	javac  -classpath $(CP) -encoding utf8 -Xlint:deprecation -Xlint:unchecked -target 1.5 $<
 
 clean:
 	rm *.class

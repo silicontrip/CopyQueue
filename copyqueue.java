@@ -30,7 +30,8 @@ public  class  copyqueue {
 					CopyJob cj = jobList.getFirstWaiting();
 					
 					Thread thread = new Thread(cj);	
-					
+					thread.setName("CopyJob");
+
 					thread.start();
 					
 					while (thread.isAlive()) {

@@ -272,6 +272,8 @@ public class Display {
 					clearLine(cursor);
 					
 					System.out.print (cj.getSourceFileName());
+
+//					System.out.print (cj.getSourcePath());
 					if (screenSize.getColumns()-(11+cj.getDestinationPathName().length())  > 0) {
 						terminal.moveCursor(screenSize.getColumns()-(11+cj.getDestinationPathName().length()),cursor);
 						System.out.print( cj.getDestinationPathName());
