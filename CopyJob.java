@@ -174,12 +174,16 @@ public class CopyJob  implements Runnable, Serializable {
 	
 	public void setSource (String src) 
 	{
-		File f = new File (src);
-		if (f == null) {
+		if (src != null) {
+			File f = new File (src);
+			if (f == null) {
+				Source = null;
+			} else if (f.isFile()) {
+				fileLength = f.length();
+				Source = f;
+			}
+		} else {
 			Source = null;
-		} else if (f.isFile()) {
-			fileLength = f.length();
-			Source = f;
 		}
 	}
 	
