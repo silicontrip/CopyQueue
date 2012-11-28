@@ -1,3 +1,3 @@
 #!/bin/sh
 
-java -cp copyqueue.jar copyclient "$@"
+java -cp ~/Developer/copyQueue/copyqueue.jar copyclient "$@"

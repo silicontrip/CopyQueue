@@ -13,7 +13,8 @@ public  class  copyclient {
 		Socket comm = new Socket(HOST,PORT);
 		
 		ObjectOutputStream oos = new ObjectOutputStream(comm.getOutputStream());
-		CopyJob copy = new CopyJob(src.getAbsolutePath(),dst.getAbsolutePath());
+		
+		CopyJob copy = new CopyJob(src==null?null:src.getAbsolutePath(),dst.getAbsolutePath());
 		
 		//System.out.println (src.getAbsolutePath() + " -> " + dst.getAbsolutePath());
 		
