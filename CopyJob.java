@@ -86,15 +86,22 @@ public class CopyJob  implements Runnable, Serializable {
 					currentBytes += length;
 				}
 				
-				inStream.close();
-				outStream.close();
 				
 				status = OK;
 				
 			} catch (Exception e) {
 				failReason = e;
 				status = ERROR;
+				
 			} 
+			finally {
+				if (inStream != null) {
+					inStream.close();
+				}
+				if (outStream != null) {
+					outStream.close();
+				}
+			}
 		} else if (!Destination.exists()) {
 			// make it
 			try {
