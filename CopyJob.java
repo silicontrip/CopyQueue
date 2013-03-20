@@ -53,7 +53,7 @@ public class CopyJob  implements Runnable, Serializable {
 	}
 	
 	
-	public void copy() {
+	public void copy()  {
 		
 		
 		if ( getSourceFileName() != null) {
@@ -89,19 +89,19 @@ public class CopyJob  implements Runnable, Serializable {
 				
 				status = OK;
 				
-			} catch (Exception e) {
-				failReason = e;
-				status = ERROR;
-				
-			} 
-			finally {
-				if (inStream != null) {
+                if (inStream != null) {
 					inStream.close();
 				}
 				if (outStream != null) {
 					outStream.close();
 				}
-			}
+
+                
+			} catch (Exception e) {
+				failReason = e;
+				status = ERROR;
+				
+			} 
 		} else if (!Destination.exists()) {
 			// make it
 			try {
