@@ -7,7 +7,7 @@ public class CopyListener  implements Runnable {
 	final int PORT = 2679;
 	final String HOST = "127.0.0.1";
 	ObjectInputStream ois;
-	ObjectOutputStream oos;
+//	ObjectOutputStream oos;
 	ServerSocket listen;
 	Socket comm;
 	
