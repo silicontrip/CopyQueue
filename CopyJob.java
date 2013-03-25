@@ -57,8 +57,8 @@ public class CopyJob  implements Runnable, Serializable {
 		
 		
 		if ( getSourceFileName() != null) {
-			InputStream inStream = null;
-			OutputStream outStream = null;
+			InputStream inStream;
+			OutputStream outStream;
 			
 			
 			try{
@@ -89,13 +89,8 @@ public class CopyJob  implements Runnable, Serializable {
 				
 				status = OK;
 				
-                if (inStream != null) {
-					inStream.close();
-				}
-				if (outStream != null) {
-					outStream.close();
-				}
-
+				inStream.close();
+				outStream.close();
                 
 			} catch (Exception e) {
 				failReason = e;
@@ -105,8 +100,12 @@ public class CopyJob  implements Runnable, Serializable {
 		} else if (!Destination.exists()) {
 			// make it
 			try {
-				Destination.mkdir();
-				status = OK;
+                // may return error
+				status = ERROR;
+                if (Destination.mkdir())
+                {
+				    status = OK;
+                }
 			} catch (Exception e) {
 				failReason = e;
 				status = ERROR;
@@ -182,26 +181,16 @@ public class CopyJob  implements Runnable, Serializable {
 	public void setSource (String src) 
 	{
 		if (src != null) {
-			File f = new File (src);
-			if (f == null) {
-				Source = null;
-			} else if (f.isFile()) {
-				fileLength = f.length();
-				Source = f;
-			}
-		} else {
+            Source = new File (src);
+			fileLength = Source.length();
+        } else {
 			Source = null;
 		}
 	}
 	
 	public void setDestination (String dst) 
 	{
-		File f = new File (dst);
-		if (f == null) {
-			Destination = null;
-		} else {
-			Destination = f;
-		}
+        Destination = new File (dst);
 	}
 	
 	

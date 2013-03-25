@@ -31,20 +31,19 @@ public  class  copyclient {
 		
 		File filelist[] = dir.listFiles();
 		
+		    if (filelist != null) {
 		
-		
-		for (File sourcefile: filelist) {
+		        for (File sourcefile: filelist) {
 			
-			if (sourcefile.isFile()) {
-				addFile(sourcefile,destinationFile);
-			} else if ( sourcefile.isDirectory()) {
-				handleDirectory(sourcefile,	destinationFile);						
-			} else {
-				System.out.println ("Source is not a file.");
-			}
-			
-			
-		}
+			        if (sourcefile.isFile()) {
+				        addFile(sourcefile,destinationFile);
+			        } else if ( sourcefile.isDirectory()) {
+				        handleDirectory(sourcefile,	destinationFile);
+			        } else {
+				        System.out.println ("Source is not a file.");
+			        }
+		       }
+           }
 	}
 	
 	public static void main(String[] args) {
