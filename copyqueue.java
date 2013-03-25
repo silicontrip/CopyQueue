@@ -46,7 +46,6 @@ public  class  copyqueue {
 					display.updateList(jobList);
 					try {
 						thread.join();
-						
 					} catch (java.lang.InterruptedException e) {
 						//  I don't care if I'm interrupted here.
 					}

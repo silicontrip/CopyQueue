@@ -20,35 +20,37 @@ public class CopyListener  implements Runnable {
 	public void run() {
 		
 		CopyJobList jobList = CopyJobList.getInstance();
-		
-		while (true) {
-			try {
-				comm = listen.accept();
-				ois = new ObjectInputStream(comm.getInputStream());
 
-				CopyJob copy = (CopyJob) ois.readObject();
-				jobList.add(copy);
-				
-			} catch (Exception e) {
-				// not sure what to do with these.
-				// need a log...
-				System.out.println ("input: " + e.getMessage());
-				e.printStackTrace();
-				
-			}
-			
-			try {	
-				if (ois != null) 
-					ois.close();
-				comm.close();
-			} catch (Exception e) {
-				// not sure what to do with these.
-				System.out.println ("close: " + e.getMessage());
-				e.printStackTrace();
-				
-			}
-			
-		}
+
+            do {
+                try {
+                    comm = listen.accept();
+                    ois = new ObjectInputStream(comm.getInputStream());
+
+                    CopyJob copy = (CopyJob) ois.readObject();
+                    jobList.add(copy);
+
+                } catch (Exception e) {
+                    // not sure what to do with these.
+                    // need a log...
+                    System.out.println("input: " + e.getMessage());
+                    e.printStackTrace();
+
+                }
+
+                try {
+                    if (ois != null)
+                        ois.close();
+                    comm.close();
+                } catch (Exception e) {
+                    // not sure what to do with these.
+                    System.out.println("close: " + e.getMessage());
+                    e.printStackTrace();
+
+                }
+
+            } while (true);
+
 	}
 	
 }
