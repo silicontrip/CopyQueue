@@ -1,5 +1,4 @@
 import java.util.Vector;
-import java.util.Iterator;
 
 public class CopyJobList extends Vector<CopyJob>
 {
@@ -26,11 +25,8 @@ public class CopyJobList extends Vector<CopyJob>
 		remainingBytes = 0;
 		totalBytes = 0;
 		errorNumber = 0;
-		
-		
-		Iterator<CopyJob> it =  this.iterator();
-		while (it.hasNext()) {
-			CopyJob cj = it.next();
+
+		for (CopyJob cj : this) {
 			
 			if (cj.isErrored()) {
 				errorNumber ++;
@@ -76,9 +72,9 @@ public class CopyJobList extends Vector<CopyJob>
 		
 	
 	CopyJob getFirstWaiting() {
-		Iterator<CopyJob> it =  this.iterator();
-		while (it.hasNext()) {
-			CopyJob cj = it.next();
+
+		for (CopyJob cj : this)
+        {
 			if (cj.isWaiting()) 
 				return cj; 
 		}
@@ -86,18 +82,14 @@ public class CopyJobList extends Vector<CopyJob>
 	}
 
 	boolean hasFirstWaiting() {
-		Iterator<CopyJob> it =  this.iterator();
-		while (it.hasNext()) {
-			if (it.next().isWaiting()) 
-				return true; 
-		}
-		return false;
+        return this.getFirstWaiting()!=null;
 	}
 	
 	CopyJob getCopying() {
-		Iterator<CopyJob> it =  this.iterator();
-		while (it.hasNext()) {
-			CopyJob cj = it.next();
+		// for (Iterator<CopyJob> it =  this.iterator(); it.hasNext();)
+	 //	{
+		for (CopyJob cj : this)
+        {
 			if (cj.isCopying()) 
 				return cj; 
 		}
@@ -106,12 +98,7 @@ public class CopyJobList extends Vector<CopyJob>
 	
 	
 	boolean isCopying() {
-		Iterator<CopyJob> it =  this.iterator();
-		while (it.hasNext()) {
-			if (it.next().isCopying()) 
-				return true; 
-		}
-		return false;
+        return this.getCopying() != null;
 	}
 	
 	
