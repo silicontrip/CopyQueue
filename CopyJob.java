@@ -9,8 +9,7 @@ public class CopyJob  implements Runnable, Serializable {
 	public final static int WAIT = 1;
 	public final static int COPY = 2;
 	public final static int ERROR = 3;
-	
-	
+
 	private File Source;
 	private File Destination;
 	private int status;
@@ -130,7 +129,8 @@ public class CopyJob  implements Runnable, Serializable {
 	public int getStatus() { return status; }
 	
 	public Exception getStatusException() { return failReason; }
-	
+	public String getStatusExceptionMessage() {return failReason.getMessage();}
+
 	public String getSourceFileName() {
 		if (Source != null) {
 			return Source.getName();

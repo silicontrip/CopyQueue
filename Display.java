@@ -261,7 +261,7 @@ public class Display {
 
 					clearLine(cursor); 
 										
-					String disp = cj.getSourceFileName() + ": " + cj.getStatusException().getMessage();
+					String disp = cj.getSourceFileName() + ": " + cj.getStatusExceptionMessage();
 					// truncate if greater than 
 					if (disp.length() > screenSize.getColumns()) {
 						disp = disp.substring(0,screenSize.getColumns()-1);
