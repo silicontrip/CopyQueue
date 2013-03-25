@@ -1,10 +1,6 @@
-import java.io.File;
-import java.util.Iterator;
-
 
 public  class  copyqueue {
-	
-	
+
 	public static void main(String[] args) {
 		
 		CopyJobList jobList = CopyJobList.getInstance();
@@ -43,7 +39,6 @@ public  class  copyqueue {
 						try {
 							Thread.sleep(250);
 						} catch (java.lang.InterruptedException e) {
-							;
 							// but I don't want to be interrupted.
 						}
 					}
@@ -53,7 +48,6 @@ public  class  copyqueue {
 						thread.join();
 						
 					} catch (java.lang.InterruptedException e) {
-						;
 						//  I don't care if I'm interrupted here.
 					}
 					
@@ -62,7 +56,6 @@ public  class  copyqueue {
 				try {
 					Thread.sleep(250);
 				} catch (java.lang.InterruptedException e) {
-					;
 					// but I don't want to be interrupted.
 				}
 				
